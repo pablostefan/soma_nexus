@@ -1,0 +1,11 @@
+version: "1"
+entries:
+  - componentKey: ds.button.primary
+    dsPath: lib/widgets/ds_button.dart
+    docPath: lib/widgets/docs/figma-to-code.md
+    figmaAliases:
+      - Button
+      - Primary Button
+    figmaComponentIds:
+      - "123:456"
+    status: draft
