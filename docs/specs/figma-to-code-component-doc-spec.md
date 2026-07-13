@@ -4,6 +4,11 @@ Every Design System component that should be auto-mapped from Figma must provide
 
 `{component}/docs/figma-to-code.md`
 
+In Flutter monorepos, it is also recommended to keep these companion docs in the same folder:
+
+- `{component}/docs/{component}.md` (component usage and behavior)
+- `{component}/docs/acessibilidade.md` (accessibility implementation)
+
 ## Required format
 
 The file must start with YAML frontmatter.
@@ -63,3 +68,6 @@ Component-level notes...
 - If component has no local doc, it should not be matched automatically.
 - `componentKey` in local doc must match entry in global index.
 - Prefer explicit ids over alias-only mapping.
+- Register companion docs in global index when available:
+  - `componentDocPath`
+  - `accessibilityDocPath`

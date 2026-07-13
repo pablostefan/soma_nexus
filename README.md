@@ -60,6 +60,7 @@ npm test
 - `validate_figma_to_code_index`: valida índice global e docs por componente
 - `preview_figma_component_mapping`: mostra melhor match de componente DS para um node Figma
 - `generate_flutter_component_from_figma`: gera snippet Flutter mínimo via mapping federado
+- `generate_flutter_page_from_figma`: gera estrutura Flutter de página inteira com DS quando houver match
 
 ## Economia de tokens (recomendado)
 
@@ -132,9 +133,10 @@ Na primeira vez, VS Code pergunta token e guarda valor localmente.
 0. `validate_figma_to_code_index`
 1. `parse_figma_url`
 2. `preview_figma_component_mapping`
-3. `generate_flutter_component_from_figma`
-4. `get_figma_node_normalized` (debug/inspeção)
-5. `get_figma_images` (se precisar assets)
+3. `generate_flutter_component_from_figma` (quando URL aponta para componente)
+4. `generate_flutter_page_from_figma` (quando URL aponta para frame/página)
+5. `get_figma_node_normalized` (debug/inspeção)
+6. `get_figma_images` (se precisar assets)
 
 Esse fluxo evita payload gigante e melhora estabilidade da geração de código.
 

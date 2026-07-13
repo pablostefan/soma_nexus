@@ -21,9 +21,15 @@ Required entry fields:
 - `figmaComponentIds`
 - `status`
 
+Optional but recommended in Flutter monorepos:
+
+- `componentDocPath` (usually `{component}/docs/{component}.md`)
+- `accessibilityDocPath` (usually `{component}/docs/acessibilidade.md`)
+
 ## Recommended practice
 
 - Prefer explicit `figmaComponentIds` whenever possible.
 - Keep aliases short and stable.
 - Add at least one realistic `examples` snippet.
 - Keep `status: draft` until mapping is validated in real URL tests.
+- Keep companion docs paths updated to improve generation quality and accessibility hints.

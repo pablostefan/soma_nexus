@@ -63,6 +63,7 @@ export type FlutterGenerationResult = {
   dartCode: string;
   importLine: string;
   widgetLine: string;
+  widgetInvocation: string;
   mappedProps: Array<{ figmaProp: string; codeProp: string; value: string }>;
   unmappedFigmaProps: string[];
 };
@@ -72,14 +73,19 @@ export type FlutterGenerationMode = "standard" | "compact";
 export type FlutterGenerationCompactResult = {
   dartCode: string;
   widgetLine: string;
+  widgetInvocation: string;
+};
+
+export type ComponentInvocationResult = {
+  importLine: string;
+  widgetLine: string;
+  widgetInvocation: string;
+  mappedProps: Array<{ figmaProp: string; codeProp: string; value: string }>;
+  unmappedFigmaProps: string[];
 };
 
 export class FlutterComponentGenerator {
-  generate(
-    node: unknown,
-    resolution: MappingResolution,
-    mode: FlutterGenerationMode = "standard"
-  ): FlutterGenerationResult | FlutterGenerationCompactResult {
+  generateInvocation(node: unknown, resolution: MappingResolution): ComponentInvocationResult {
     if (!resolution.matched || !resolution.mapping || !resolution.code) {
       throw new AppError("INVALID_INPUT", "Cannot generate component code without a resolved mapping.");
     }
@@ -108,28 +114,44 @@ export class FlutterComponentGenerator {
 
     const widgetLine = `${resolution.code.widget}(`;
     const importLine = `import '${resolution.code.import}';`;
-
-    const dartCode = [
-      importLine,
-      "",
+    const widgetInvocation = [
       widgetLine,
       ...propLines,
-      ");"
+      ")"
     ].join("\n");
+
+    return {
+      importLine,
+      widgetLine,
+      widgetInvocation,
+      mappedProps,
+      unmappedFigmaProps
+    };
+  }
+
+  generate(
+    node: unknown,
+    resolution: MappingResolution,
+    mode: FlutterGenerationMode = "standard"
+  ): FlutterGenerationResult | FlutterGenerationCompactResult {
+    const invocation = this.generateInvocation(node, resolution);
+    const dartCode = [invocation.importLine, "", `${invocation.widgetInvocation};`].join("\n");
 
     if (mode === "compact") {
       return {
         dartCode,
-        widgetLine
+        widgetLine: invocation.widgetLine,
+        widgetInvocation: invocation.widgetInvocation
       };
     }
 
     return {
       dartCode,
-      importLine,
-      widgetLine,
-      mappedProps,
-      unmappedFigmaProps
+      importLine: invocation.importLine,
+      widgetLine: invocation.widgetLine,
+      widgetInvocation: invocation.widgetInvocation,
+      mappedProps: invocation.mappedProps,
+      unmappedFigmaProps: invocation.unmappedFigmaProps
     };
   }
 }

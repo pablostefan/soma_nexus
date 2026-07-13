@@ -1,6 +1,17 @@
+import { access } from "node:fs/promises";
+
 import { ValidationIssue, ValidationReport } from "../core/types.js";
 import { ComponentDocLoader } from "../infrastructure/component-doc-loader.js";
 import { MappingIndexLoader } from "../infrastructure/mapping-index-loader.js";
+
+async function fileExists(filePath: string): Promise<boolean> {
+  try {
+    await access(filePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export class ContractValidator {
   constructor(
@@ -81,6 +92,50 @@ export class ContractValidator {
           componentKey: entry.componentKey,
           docPath: entry.docPath
         });
+      }
+
+      if (!entry.componentDocPath) {
+        issues.push({
+          level: "warning",
+          code: "COMPONENT_DOC_PATH_MISSING",
+          message:
+            "componentDocPath is not set. In Flutter monorepos, point to {component}/docs/{component}.md.",
+          componentKey: entry.componentKey,
+          docPath: entry.docPath
+        });
+      } else {
+        const resolvedComponentDocPath = this.indexLoader.resolveDocPath(entry.componentDocPath);
+        if (!(await fileExists(resolvedComponentDocPath))) {
+          issues.push({
+            level: "warning",
+            code: "COMPONENT_DOC_NOT_FOUND",
+            message: `componentDocPath does not exist: ${entry.componentDocPath}`,
+            componentKey: entry.componentKey,
+            docPath: entry.componentDocPath
+          });
+        }
+      }
+
+      if (!entry.accessibilityDocPath) {
+        issues.push({
+          level: "warning",
+          code: "A11Y_DOC_PATH_MISSING",
+          message:
+            "accessibilityDocPath is not set. In Flutter monorepos, point to {component}/docs/acessibilidade.md.",
+          componentKey: entry.componentKey,
+          docPath: entry.docPath
+        });
+      } else {
+        const resolvedAccessibilityDocPath = this.indexLoader.resolveDocPath(entry.accessibilityDocPath);
+        if (!(await fileExists(resolvedAccessibilityDocPath))) {
+          issues.push({
+            level: "warning",
+            code: "A11Y_DOC_NOT_FOUND",
+            message: `accessibilityDocPath does not exist: ${entry.accessibilityDocPath}`,
+            componentKey: entry.componentKey,
+            docPath: entry.accessibilityDocPath
+          });
+        }
       }
     }
 

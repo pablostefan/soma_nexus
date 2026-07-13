@@ -62,7 +62,9 @@ test("validateIndexAndDocs returns valid report when index/docs are consistent",
   const report = await validator.validateIndexAndDocs();
 
   assert.equal(report.isValid, true);
-  assert.equal(report.issues.length, 0);
+  assert.equal(report.issues.some((issue) => issue.level === "error"), false);
+  assert.ok(report.issues.some((issue) => issue.code === "COMPONENT_DOC_PATH_MISSING"));
+  assert.ok(report.issues.some((issue) => issue.code === "A11Y_DOC_PATH_MISSING"));
   assert.equal(report.stats.totalEntries, 1);
   assert.equal(report.stats.readyEntries, 1);
   assert.equal(report.stats.draftEntries, 0);
@@ -136,4 +138,6 @@ test("validateIndexAndDocs reports duplicate alias and component key mismatch", 
   const codes = report.issues.map((issue) => issue.code);
   assert.ok(codes.includes("DUPLICATE_ALIAS"));
   assert.ok(codes.includes("COMPONENT_KEY_MISMATCH"));
+  assert.ok(codes.includes("COMPONENT_DOC_PATH_MISSING"));
+  assert.ok(codes.includes("A11Y_DOC_PATH_MISSING"));
 });

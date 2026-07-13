@@ -3,6 +3,8 @@ entries:
   - componentKey: ds.button.primary
     dsPath: lib/widgets/ds_button.dart
     docPath: lib/widgets/docs/figma-to-code.md
+    componentDocPath: lib/widgets/docs/ds_button.md
+    accessibilityDocPath: lib/widgets/docs/acessibilidade.md
     figmaAliases:
       - Button
       - Primary Button

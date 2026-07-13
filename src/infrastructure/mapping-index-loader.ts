@@ -36,10 +36,22 @@ function validateIndexEntry(raw: unknown, index: number): FigmaToCodeIndexEntry 
     throw new AppError("CONTRACT_INVALID", "docPath is required in index entry.", { index });
   }
 
+  const componentDocPath =
+    typeof entry.componentDocPath === "string" && entry.componentDocPath.trim()
+      ? entry.componentDocPath.trim()
+      : undefined;
+
+  const accessibilityDocPath =
+    typeof entry.accessibilityDocPath === "string" && entry.accessibilityDocPath.trim()
+      ? entry.accessibilityDocPath.trim()
+      : undefined;
+
   return {
     componentKey: entry.componentKey.trim(),
     dsPath: entry.dsPath.trim(),
     docPath: entry.docPath.trim(),
+    componentDocPath,
+    accessibilityDocPath,
     figmaAliases: normalizeStringArray(entry.figmaAliases),
     figmaComponentIds: normalizeStringArray(entry.figmaComponentIds),
     status

@@ -7,9 +7,10 @@ This workflow is optimized for minimal payload and stable output.
 1. Parse link using `parse_figma_url`.
 2. Validate contracts using `validate_figma_to_code_index`.
 3. Preview mapping with `preview_figma_component_mapping` using `responseMode=compact`.
-4. Generate code using `generate_flutter_component_from_figma` with `responseMode=compact`.
-5. Use `get_figma_node_normalized` only for inspection/debug.
-6. Use `get_figma_file` only in exceptional debug scenarios.
+4. Generate component code with `generate_flutter_component_from_figma` when node is a DS component.
+5. Generate page code with `generate_flutter_page_from_figma` when node is frame/page.
+6. Use `get_figma_node_normalized` only for inspection/debug.
+7. Use `get_figma_file` only in exceptional debug scenarios.
 
 ## Why this flow
 
@@ -29,6 +30,7 @@ This workflow is optimized for minimal payload and stable output.
 1. `parse_figma_url(figmaUrl)`
 2. `preview_figma_component_mapping(figmaUrl, responseMode="compact")`
 3. `generate_flutter_component_from_figma(figmaUrl, responseMode="compact")`
+4. `generate_flutter_page_from_figma(figmaUrl, responseMode="compact", depth=4, maxNodes=120)`
 
 ## Fallbacks
 

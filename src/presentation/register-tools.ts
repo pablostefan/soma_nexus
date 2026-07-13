@@ -5,6 +5,7 @@ import { collectNormalizedData, extractNodeSummary } from "../application/node-n
 import { ComponentMatcher, MappingResolution } from "../application/component-matcher.js";
 import { ContractValidator } from "../application/contract-validator.js";
 import { FlutterComponentGenerator } from "../application/flutter-component-generator.js";
+import { FlutterPageGenerator } from "../application/flutter-page-generator.js";
 import { AppError } from "../core/errors.js";
 import { ok, ResponseMode, runTool } from "../core/responses.js";
 import { parseFigmaUrl, parseNodeIds } from "../domain/figma-url.js";
@@ -20,11 +21,14 @@ type RegisterToolsDependencies = {
   contractValidator: ContractValidator;
   componentMatcher: ComponentMatcher;
   flutterGenerator: FlutterComponentGenerator;
+  flutterPageGenerator: FlutterPageGenerator;
 };
 
 const DEFAULT_NODE_DEPTH = 1;
+const DEFAULT_PAGE_DEPTH = 4;
 const DEFAULT_COMPACT_CANDIDATES = 3;
 const DEFAULT_STANDARD_CANDIDATES = 10;
+const DEFAULT_PAGE_MAX_NODES = 120;
 
 function extractedCounts(extracted: ReturnType<typeof collectNormalizedData>) {
   return {
@@ -136,7 +140,8 @@ export function registerTools({
   figmaClient,
   contractValidator,
   componentMatcher,
-  flutterGenerator
+  flutterGenerator,
+  flutterPageGenerator
 }: RegisterToolsDependencies) {
   server.registerTool(
     "get_figma_file",
@@ -397,6 +402,81 @@ export function registerTools({
               };
 
         return ok(output, toResponseOptions(mode, debugTelemetry, data, { effectiveDepth }));
+      }, { mode });
+    }
+  );
+
+  server.registerTool(
+    "generate_flutter_page_from_figma",
+    {
+      description:
+        "Generate Flutter page scaffold from a Figma page/frame URL, using DS components when matched.",
+      inputSchema: {
+        figmaUrl: z.string().url(),
+        version: z.string().optional(),
+        depth: z.number().int().min(1).max(8).optional(),
+        maxNodes: z.number().int().min(10).max(500).optional(),
+        responseMode: z.enum(["standard", "compact"]).optional(),
+        debugTelemetry: z.boolean().optional()
+      },
+      annotations: {
+        title: "Generate Flutter Page From Figma",
+        readOnlyHint: true,
+        openWorldHint: false
+      }
+    },
+    async ({ figmaUrl, version, depth, maxNodes, responseMode, debugTelemetry }) => {
+      const mode = responseMode ?? "standard";
+      const effectiveDepth = depth ?? DEFAULT_PAGE_DEPTH;
+      const effectiveMaxNodes = maxNodes ?? DEFAULT_PAGE_MAX_NODES;
+
+      return runTool(async () => {
+        const parsed = parseFigmaUrl(figmaUrl);
+
+        if (!parsed.nodeId) {
+          throw new AppError("NODE_ID_MISSING", "Figma URL must include node-id.", { figmaUrl });
+        }
+
+        const data = await figmaClient.getNodes(parsed.fileKey, parsed.nodeId, {
+          version,
+          depth: effectiveDepth
+        });
+
+        const node = data.nodes?.[parsed.nodeId]?.document;
+        if (!node) {
+          throw new AppError("FIGMA_NOT_FOUND", "Node not found in Figma response.", {
+            fileKey: parsed.fileKey,
+            nodeId: parsed.nodeId
+          });
+        }
+
+        const page = await flutterPageGenerator.generate(node, {
+          mode,
+          maxNodes: effectiveMaxNodes
+        });
+
+        const output =
+          mode === "compact"
+            ? {
+                fileKey: parsed.fileKey,
+                nodeId: parsed.nodeId,
+                dartCode: page.dartCode,
+                stats: page.stats,
+                warningCount: page.warnings.length
+              }
+            : {
+                fileKey: parsed.fileKey,
+                nodeId: parsed.nodeId,
+                generated: page
+              };
+
+        return ok(
+          output,
+          toResponseOptions(mode, debugTelemetry, data, {
+            effectiveDepth,
+            effectiveMaxNodes
+          })
+        );
       }, { mode });
     }
   );

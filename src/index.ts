@@ -5,6 +5,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { ComponentMatcher } from "./application/component-matcher.js";
 import { ContractValidator } from "./application/contract-validator.js";
 import { FlutterComponentGenerator } from "./application/flutter-component-generator.js";
+import { FlutterPageGenerator } from "./application/flutter-page-generator.js";
 import { ComponentDocLoader } from "./infrastructure/component-doc-loader.js";
 import { FigmaApiClient } from "./infrastructure/figma-api-client.js";
 import { MappingIndexLoader } from "./infrastructure/mapping-index-loader.js";
@@ -27,13 +28,15 @@ const componentDocLoader = new ComponentDocLoader();
 const contractValidator = new ContractValidator(mappingIndexLoader, componentDocLoader);
 const componentMatcher = new ComponentMatcher(mappingIndexLoader, componentDocLoader);
 const flutterGenerator = new FlutterComponentGenerator();
+const flutterPageGenerator = new FlutterPageGenerator(componentMatcher, flutterGenerator);
 
 registerTools({
   server,
   figmaClient,
   contractValidator,
   componentMatcher,
-  flutterGenerator
+  flutterGenerator,
+  flutterPageGenerator
 });
 
 const transport = new StdioServerTransport();

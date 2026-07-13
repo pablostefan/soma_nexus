@@ -4,6 +4,8 @@ export type FigmaToCodeIndexEntry = {
   componentKey: string;
   dsPath: string;
   docPath: string;
+  componentDocPath?: string;
+  accessibilityDocPath?: string;
   figmaAliases: string[];
   figmaComponentIds: string[];
   status: MappingStatus;
