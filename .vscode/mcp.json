@@ -1,0 +1,20 @@
+{
+	"inputs": [
+		{
+			"id": "figma-token",
+			"type": "promptString",
+			"description": "FIGMA_TOKEN for Soma Nexus MCP",
+			"password": true
+		}
+	],
+	"servers": {
+		"soma-nexus-figma-mcp": {
+			"type": "stdio",
+			"command": "npm",
+			"args": ["run", "dev"],
+			"env": {
+				"FIGMA_TOKEN": "${input:figma-token}"
+			}
+		}
+	}
+}

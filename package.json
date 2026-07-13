@@ -1,0 +1,30 @@
+{
+  "name": "soma-nexus-mcp-figma",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "MCP server for pulling Figma data and preparing Flutter code generation.",
+  "bin": {
+    "soma-nexus-mcp-figma": "./build/index.js"
+  },
+  "files": [
+    "build",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx watch src/index.ts",
+    "start": "node build/index.js",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.3",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.10",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}
